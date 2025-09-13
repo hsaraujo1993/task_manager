@@ -177,6 +177,7 @@
             <hr style="margin: 20px 0;">
 
             <div class="action-buttons">
+                <a href="{% url 'update_task' pk=task.pk %}?done=true" class="btn btn-success">Concluir tarefa</a>
                 <a href="{% url 'update_task' pk=task.pk %}" class="btn btn-default">Editar</a>
                 <a href="{% url 'delete_task' pk=task.pk %}" class="btn btn-danger">Deletar</a>
                 <a href="{% url 'tasks_list' %}" class="btn btn-secondary">Voltar para a lista</a>

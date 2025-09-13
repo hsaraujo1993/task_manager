@@ -187,6 +187,87 @@
             white-space: nowrap;
         }
 
+        /* CSS para Paginação */
+        .pagination-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .pagination .page-item {
+            display: flex;
+        }
+
+        .pagination .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            border: 1px solid #dee2e6;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .pagination .page-item.disabled .page-link:hover {
+            background-color: #e9ecef;
+            color: #6c757d;
+            border-color: #dee2e6;
+        }
+
+        .pagination-info {
+            font-size: 0.9rem;
+            color: var(--light-text-color);
+            font-weight: 600;
+        }
+
+        /* Responsividade da paginação */
+        @media (max-width: 768px) {
+            .pagination-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
     </style>
 
     <div class="page-content">
@@ -229,22 +310,30 @@
                 <li class="task-item">
                     <div class="task-details">
                         <h2><a href="{% url 'detail_task' task.pk %}">{{task.title}}</a></h2>
-                        <p>Descrição: {{task.description}}</p>
                         <div class="tags-list">
-                            <p>Status:</p>
+                            <h4>Status:</h4>
                             <span class="status-badge">{{task.get_status_display}}</span>
                         </div>
                         <div class="tags-list">
-                            <p>Tags:</p>
+                            <h4>Tags:</h4>
                             {% for tag in task.tags.all %}
                                 <span class="tag-badge">{{tag.name}}</span>
                             {% empty %}
-                                <span class="tag-badge no-tags">Nenhuma</span>
+                                <span class="tag-badge no-tags">Sem Tags</span>
                             {% endfor %}
+                        </div>
+                        <div class="tags-list">
+                            <h4>Prazo:</h4>
+                            <span class="status-badge">
+                                {% if task.due_date %}
+                                    {{ task.due_date|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    Sem Prazo
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
                     <div class="task-actions">
-                        <a href="{% url 'detail_task' task.pk %}" class="btn btn-default">Visualizar</a>
                         <a href="{% url 'update_task' task.pk %}" class="btn btn-default">Editar</a>
                         <a href="{% url 'delete_task' task.pk %}" class="btn btn-danger">Deletar</a>
                     </div>
@@ -252,12 +341,90 @@
                 {% empty %}
                 <li class="task-item">
                     <div class="task-details">
-                        <h2>Nenhuma tarefa encontrada.</h2>
+                        <h2>Nenhuma tarefa encontrada, ou todas foram concluidas.</h2>
                         <p>Comece criando uma nova tarefa para organizar o seu dia!</p>
                     </div>
                 </li>
                 {% endfor %}
             </ul>
+
+            <!-- Seção de Paginação -->
+            {% if is_paginated %}
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} tarefas
+                </div>
+
+                <nav aria-label="Navegação da página">
+                    <ul class="pagination">
+                        <!-- Primeira página -->
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if query_params %}&{{ query_params.urlencode }}{% endif %}" aria-label="Primeira página">
+                                    ««
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">««</span>
+                            </li>
+                        {% endif %}
+
+                        <!-- Página anterior -->
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params.urlencode }}{% endif %}" aria-label="Página anterior">
+                                    ‹
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">‹</span>
+                            </li>
+                        {% endif %}
+
+                        <!-- Números das páginas -->
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if query_params %}&{{ query_params.urlencode }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Próxima página -->
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params.urlencode }}{% endif %}" aria-label="Próxima página">
+                                    ›
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">›</span>
+                            </li>
+                        {% endif %}
+
+                        <!-- Última página -->
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query_params %}&{{ query_params.urlencode }}{% endif %}" aria-label="Última página">
+                                    »»
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">»»</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
         </section>
     </div>
 {% endblock %}
