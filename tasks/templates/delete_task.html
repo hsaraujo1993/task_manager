@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .delete-card {
+        background: var(--card-background);
+        padding: 2.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin: 2rem auto;
+        max-width: 600px;
+        text-align: center;
+    }
+
+    .delete-card h1 {
+        font-size: 2rem;
+        color: #d32f2f;
+        margin-bottom: 1rem;
+    }
+
+    .delete-card p {
+        font-size: 1.1rem;
+        color: var(--text-color);
+        margin-bottom: 2rem;
+    }
+
+    .delete-card p strong {
+        color: #d32f2f;
+    }
+
+    .buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        cursor: pointer;
+        border: none;
+        text-align: center;
+    }
+
+    .btn-danger {
+        background-color: #d32f2f;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #a31f1f;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background-color: #e0e0e0;
+        color: var(--text-color);
+    }
+
+    .btn-secondary:hover {
+        background-color: #ccc;
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="delete-card">
+    <h1>Deletar Tarefa</h1>
+    <p>Tem certeza que deseja deletar a tarefa <strong>{{ task.title }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="buttons-container">
+            <button type="submit" class="btn btn-danger">Deletar</button>
+            <a href="{% url 'detail_task' pk=task.pk %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

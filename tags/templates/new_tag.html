@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Estilos específicos do formulário e seu container */
+    .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+        display: flex; /* Adiciona Flexbox para centralizar o conteúdo */
+        justify-content: center;
+    }
+
+    .form-section {
+        background: var(--card-background);
+        padding: 2.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        width: 100%; /* Ocupa a largura total do container */
+    }
+
+    .form-section h1 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: var(--secondary-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column; /* Organiza label e input em coluna */
+    }
+
+    .form-group label {
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        color: var(--light-text-color);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="datetime-local"],
+    .form-group textarea,
+    .form-group select {
+        width: 100%; /* Garante que os campos ocupem a largura total */
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: var(--border-radius);
+        font-family: 'Roboto', sans-serif;
+        font-size: 1rem;
+    }
+
+    .form-group select[multiple] {
+        min-height: 100px;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .btn-submit {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        width: 100%;
+        display: block;
+    }
+
+    .btn-submit:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="container">
+    <section class="form-section">
+        <h1>Criar Nova TAG</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">Nome:</label>
+                {{ form.name }}
+            </div>
+
+            <div class="form-actions" style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                <!-- Botão Cadastrar -->
+                <button type="submit" class="btn-submit">Cadastrar</button>
+
+                <!-- Botão Cancelar -->
+                <a href="{{ request.GET.next|default:'{% url "tags_list" %}' }}"
+                   class="btn btn-secondary"
+                   style="flex: 1; text-align: center; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; text-decoration: none;">
+                    Cancelar
+                </a>
+            </div>
+
+        </form>
+    </section>
+</div>
+
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .form-section {
+            background: var(--card-background);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .form-section h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--light-text-color);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="datetime-local"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .buttons-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: var(--text-color);
+        }
+
+        .btn-danger {
+            background-color: #d32f2f;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* CSS Grid para Tags - Solução universal para Django forms */
+        .tags-grid-container {
+            margin-top: 10px;
+        }
+
+        /* Resetar estilos padrão de lista */
+        .tags-grid-container ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .tags-grid-container li {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .tags-grid-container li label {
+            display: flex;
+            align-items: center;
+            font-weight: normal !important;
+            margin-bottom: 0 !important;
+            cursor: pointer;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .tags-grid-container input[type="checkbox"] {
+            width: auto !important;
+            margin-right: 8px;
+            margin-bottom: 0 !important;
+            flex-shrink: 0;
+        }
+
+        /* Fallback caso não seja uma lista */
+        .tags-grid-container > div {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .tags-grid-container > div > label {
+            display: flex;
+            align-items: center;
+            font-weight: normal !important;
+            margin-bottom: 0 !important;
+            cursor: pointer;
+        }
+
+        /* Para telas menores */
+        @media (max-width: 768px) {
+            .tags-grid-container ul,
+            .tags-grid-container > div {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tags-grid-container ul,
+            .tags-grid-container > div {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <div class="container">
+        <section class="form-section">
+            <h1>Editar Tarefa</h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}">Título</label>
+                    {{ form.title }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}">Descrição</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.due_date.id_for_label }}">Data de Finalização</label>
+                    {{ form.due_date }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.status.id_for_label }}">Status</label>
+                    {{ form.status }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.priority.id_for_label }}">Prioridade</label>
+                    {{ form.priority }}
+                </div>
+
+                <div class="form-group">
+                    <a href="{% url 'new_tag' %}?next={{ request.get_full_path }}" class="btn btn-default">
+                        Cadastrar TAG
+                    </a>
+                </div>
+
+                <div class="form-group">
+                        <label>Tags</label>
+                        <div class="tags-grid-container">
+                            {{ form.tags }}
+                        </div>
+                </div>
+
+                <div class="buttons-container">
+                    <input type="submit" value="Salvar Alterações" class="btn btn-primary">
+                    <a href="{% url 'tasks_list' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        // Força o grid caso o CSS não funcione
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.tags-grid-container');
+            if (container) {
+                // Encontra todos os checkboxes dentro do container
+                const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+                if (checkboxes.length > 0) {
+                    // Se existir ul, aplica grid nela
+                    const ul = container.querySelector('ul');
+                    if (ul) {
+                        ul.style.display = 'grid';
+                        ul.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                        ul.style.gap = '15px';
+                        ul.style.listStyle = 'none';
+                        ul.style.margin = '10px 0 0 0';
+                        ul.style.padding = '0';
+                    } else {
+                        // Se não existe ul, aplica no primeiro elemento filho
+                        const firstChild = container.firstElementChild;
+                        if (firstChild) {
+                            firstChild.style.display = 'grid';
+                            firstChild.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                            firstChild.style.gap = '15px';
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

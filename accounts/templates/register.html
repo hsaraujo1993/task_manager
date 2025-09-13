@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .register-container {
+        max-width: 400px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    .register-container h2 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: var(--secondary-color);
+    }
+
+    form table {
+        width: 100%;
+    }
+
+    form input {
+        width: 100%;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    .btn-submit {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.75rem;
+        width: 100%;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 1rem;
+        font-weight: bold;
+    }
+
+    .btn-submit:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .errorlist {
+        color: red;
+        font-size: 0.9rem;
+        margin: 0.25rem 0;
+        list-style: none;
+        padding: 0;
+    }
+</style>
+
+<div class="register-container">
+    <h2>Registrar</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        <button type="submit" class="btn-submit">Registrar</button>
+    </form>
+
+    <p style="text-align:center; margin-top:1rem;">
+        Já tem conta? <a href="{% url 'login' %}">Entrar</a>
+    </p>
+</div>
+
+{% endblock %}

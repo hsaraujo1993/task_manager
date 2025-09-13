@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Tarefas</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            color-scheme: light; /* força tema claro em todas as páginas */
+            --primary-color: #374151; /* Cinza grafite */
+            --secondary-color: #4B5563; /* Cinza médio */
+            --accent-color: #3B82F6; /* Azul neutro (apenas detalhe) */
+            --background-color: #F9FAFB; /* Fundo cinza bem claro */
+            --card-background: rgba(255, 255, 255, 0.8);
+            --text-color: #1F2937; /* Cinza escuro */
+            --light-text-color: #6B7280; /* Cinza claro */
+            --border-radius: 12px;
+            --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            --backdrop-blur: blur(10px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: var(--backdrop-blur);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header .logo a {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-menu li a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .nav-menu li a:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .hero-section {
+            background: linear-gradient(145deg, #FFFFFF, #F3F4F6);
+            padding: 5rem 2rem;
+            text-align: center;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .hero-section h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            color: var(--light-text-color);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.8rem 1.6rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--box-shadow);
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background: #2563EB; /* Azul um pouco mais escuro */
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--light-text-color);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: var(--backdrop-blur);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+            }
+
+            .nav-menu li a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .hero-section h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-section p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <a href="#">Gerenciador de Tarefas</a>
+        </div>
+        <nav>
+            <ul class="nav-menu">
+                {% if not user.is_authenticated %}
+                    <li><a href="{% url 'register' %}">Criar novo usuário</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <li>Olá, {{ user.username }}</li>
+
+                    <li><a href="{% url 'new_task' %}">Criar nova tarefa</a></li>
+                    <li><a href="{% url 'tasks_list' %}">Acessar tarefas</a></li>
+                    <li><a href="{% url 'tags_list' %}">Acessar tags</a></li>
+                    <li><a href="{% url 'logout' %}">Encerrar sessão</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Gerenciador de Tarefas. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>

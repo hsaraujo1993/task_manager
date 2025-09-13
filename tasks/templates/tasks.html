@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        /* CSS para o layout de duas colunas */
+        .page-content {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .filter-sidebar {
+            width: 280px;
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .filter-sidebar h2 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-text-color);
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .filter-group input[type="text"], .filter-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+
+        /* Botão aplicar filtros */
+        .btn-primary {
+            display: inline-block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3; /* tom mais escuro do primary */
+        }
+
+        /* Botões Visualizar e Editar */
+        .btn-edit,
+        .btn-view,
+        .task-actions .btn-default {
+            background-color: #343a40; /* cinza */
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-edit:hover,
+        .btn-view:hover,
+        .task-actions .btn-default:hover {
+            background-color: #007bff; /* azul ao passar o mouse */
+        }
+
+        /* Botão Deletar */
+        .task-actions .btn-danger {
+            background-color: #d32f2f; /* vermelho */
+            color: #fff;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .task-actions .btn-danger:hover {
+            background-color: #a31f1f; /* vermelho escuro ao passar o mouse */
+        }
+
+        /* CSS da lista de tarefas (lado direito) */
+        .tasks-section {
+            flex-grow: 1; /* Faz a seção ocupar o restante do espaço */
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .tasks-section h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        .task-list {
+            list-style: none;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .task-item {
+            background-color: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .task-details h2 {
+            font-size: 1.25rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        .task-details h2 a {
+            text-decoration: none;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        .task-details h2 a:hover {
+            color: var(--primary-color);
+        }
+
+        .task-details p {
+            font-size: 0.9rem;
+            color: var(--light-text-color);
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag-badge,
+        .status-badge {
+            background-color: var(--primary-color); /* mesma cor */
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700; /* negrito */
+            white-space: nowrap;
+        }
+
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            background-color: var(--primary-color); /* mesma cor da tag */
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+    </style>
+
+    <div class="page-content">
+        <div class="filter-sidebar">
+            <h2>Filtros</h2>
+            <form action="{% url 'tasks_list' %}" method="get">
+                <div class="filter-group">
+                    <label for="id_search">Pesquisar</label>
+                    <input type="text" id="id_search" name="search" value="{{ request.GET.search }}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="id_status">Status</label>
+                    <select id="id_status" name="status">
+                        <option value="">Todos</option>
+                        <option value="todo" {% if request.GET.status == 'todo' %}selected{% endif %}>A Fazer</option>
+                        <option value="doing" {% if request.GET.status == 'doing' %}selected{% endif %}>Em Andamento</option>
+                        <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>Concluída</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="id_priority">Prioridade</label>
+                    <select id="id_priority" name="priority">
+                        <option value="">Todas</option>
+                        <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Baixa</option>
+                        <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Média</option>
+                        <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>Alta</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">Aplicar Filtros</button>
+            </form>
+        </div>
+
+        <section class="tasks-section">
+            <h1>Minhas Tarefas</h1>
+            <ul class="task-list">
+                {% for task in tasks %}
+                <li class="task-item">
+                    <div class="task-details">
+                        <h2><a href="{% url 'detail_task' task.pk %}">{{task.title}}</a></h2>
+                        <p>Descrição: {{task.description}}</p>
+                        <div class="tags-list">
+                            <p>Status:</p>
+                            <span class="status-badge">{{task.get_status_display}}</span>
+                        </div>
+                        <div class="tags-list">
+                            <p>Tags:</p>
+                            {% for tag in task.tags.all %}
+                                <span class="tag-badge">{{tag.name}}</span>
+                            {% empty %}
+                                <span class="tag-badge no-tags">Nenhuma</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <a href="{% url 'detail_task' task.pk %}" class="btn btn-default">Visualizar</a>
+                        <a href="{% url 'update_task' task.pk %}" class="btn btn-default">Editar</a>
+                        <a href="{% url 'delete_task' task.pk %}" class="btn btn-danger">Deletar</a>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="task-item">
+                    <div class="task-details">
+                        <h2>Nenhuma tarefa encontrada.</h2>
+                        <p>Comece criando uma nova tarefa para organizar o seu dia!</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+
+    .tasks-section {
+        background: var(--card-background);
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    .tasks-section h1 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: var(--secondary-color);
+    }
+
+    .tag-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .tag-item {
+        background-color: var(--card-background);
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tag-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .tags-list h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--text-color);
+    }
+
+    .tag-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger {
+        background-color: #d32f2f;
+        color: white;
+        box-shadow: var(--box-shadow);
+    }
+
+    .btn-danger:hover {
+        background-color: #a31f1f;
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+        .tag-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .tag-actions {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
+    .btn-submit {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.85rem 2rem;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: inline-block;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        text-align: center;
+        text-decoration: none; /* garante que não tenha underline */
+    }
+
+    .btn-submit:hover {
+        background-color: var(--secondary-color); /* mantém seu hover atual */
+        transform: translateY(-3px) scale(1.03); /* efeito suave de levitação */
+        box-shadow: 0 6px 12px rgba(0,0,0,0.2); /* sombra ao hover mais chamativa */
+    }
+</style>
+
+<main class="container">
+    <section class="tasks-section">
+        <h1>Tags criadas:</h1>
+        <div class="tag-new" style="text-align:center; margin-bottom: 2rem;">
+            <a href="{% url 'new_tag' %}" class="btn-submit">Cadastrar Nova TAG</a>
+        </div>
+        <ul class="tag-list">
+            {% for tag in tags %}
+            <li class="tag-item">
+                <div class="tags-list">
+                    <h3>{{ tag.name }}</h3>
+                </div>
+                <div class="tag-actions">
+                    <a href="{% url 'delete_tag' tag.pk %}" class="btn btn-danger">Deletar</a>
+                </div>
+            </li>
+            {% empty %}
+            <li class="tag-item">
+                <div class="tag-details">
+                    <h3>Nenhuma tag encontrada.</h3>
+                    <p>Comece criando uma nova tag para organizar melhor suas tarefas!</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+</main>
+{% endblock %}

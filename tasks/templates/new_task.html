@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .form-section {
+        background: var(--card-background);
+        padding: 2.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        width: 100%;
+    }
+
+    .form-section h1 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: var(--secondary-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        color: var(--light-text-color);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="datetime-local"],
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: var(--border-radius);
+        font-family: 'Roboto', sans-serif;
+        font-size: 1rem;
+    }
+
+    .form-group select[multiple] {
+        min-height: 100px;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .btn-small {
+        padding: 0.4rem 0.8rem;  /* deixa menor que o padrão */
+        font-size: 0.85rem;      /* fonte menor */
+        border-radius: 50px;
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .btn-small:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+    }
+
+    .btn-submit {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        width: 100%;
+        display: block;
+    }
+
+    .btn-submit:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+    }
+
+    /* CSS Grid para Tags - 4 colunas */
+    .tags-container ul {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        list-style: none;
+        padding: 0;
+        margin: 10px 0 0 0;
+    }
+
+    .tags-container li {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .tags-container li label {
+        display: flex !important;
+        align-items: center;
+        font-weight: normal !important;
+        margin-bottom: 0 !important;
+        cursor: pointer;
+        white-space: nowrap;
+        width: 100%;
+    }
+
+    .tags-container input[type="checkbox"] {
+        width: auto !important;
+        margin-right: 8px;
+        margin-bottom: 0 !important;
+        flex-shrink: 0;
+    }
+
+    /* Fallback para caso não seja uma lista */
+    .tags-container > div {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+
+    .tags-container > div > label {
+        display: flex;
+        align-items: center;
+        font-weight: normal !important;
+        margin-bottom: 0 !important;
+        cursor: pointer;
+    }
+
+    /* Para telas menores */
+    @media (max-width: 768px) {
+        .tags-container ul,
+        .tags-container > div {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tags-container ul,
+        .tags-container > div {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container">
+    <section class="form-section">
+        <h1>Criar Nova Tarefa</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">Título</label>
+                {{ form.title }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">Descrição</label>
+                {{ form.description }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.due_date.id_for_label }}">Data de Finalização</label>
+                {{ form.due_date }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.status.id_for_label }}">Status</label>
+                {{ form.status }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.priority.id_for_label }}">Prioridade</label>
+                {{ form.priority }}
+            </div>
+
+            <!-- Botão Cadastrar TAG -->
+            <div class="form-group">
+                <a href="{% url 'new_tag' %}?next={{ request.get_full_path }}" class="btn btn-default btn-small">
+                    Cadastrar TAG
+                </a>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.tags.id_for_label }}">Tags</label>
+                <div class="tags-container">
+                    {{ form.tags }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Cadastrar</button>
+        </form>
+    </section>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.tags-container');
+        if (container) {
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+            if (checkboxes.length > 0) {
+                const ul = container.querySelector('ul');
+                if (ul) {
+                    ul.style.display = 'grid';
+                    ul.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                    ul.style.gap = '15px';
+                    ul.style.listStyle = 'none';
+                    ul.style.margin = '10px 0 0 0';
+                    ul.style.padding = '0';
+                } else {
+                    const firstChild = container.firstElementChild;
+                    if (firstChild) {
+                        firstChild.style.display = 'grid';
+                        firstChild.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                        firstChild.style.gap = '15px';
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

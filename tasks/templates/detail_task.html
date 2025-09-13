@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        /* CSS da Detail View - Seguindo padrão do base.html */
+        .task-detail-card {
+            background: var(--card-background);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin: 2rem auto;
+            max-width: 700px;
+        }
+
+        .task-detail-card h2 {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .task-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem 2rem;
+            margin-top: 2rem;
+        }
+
+        .task-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-info-item strong {
+            font-size: 1.1rem;
+            color: var(--light-text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .task-info-item span,
+        .task-info-item p {
+            color: var(--text-color);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .tag-badge {
+            display: inline-block;
+            background-color: #e0e0e0;
+            color: var(--text-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .action-buttons {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .btn-default {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: var(--box-shadow);
+        }
+
+        .btn-default:hover {
+            transform: scale(1.05);
+            background: #2563EB;
+        }
+
+        .btn-danger {
+            background-color: #d32f2f;
+            color: white;
+            box-shadow: var(--box-shadow);
+        }
+
+        .btn-danger:hover {
+            transform: scale(1.05);
+            background-color: #a31f1f;
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: var(--text-color);
+            box-shadow: var(--box-shadow);
+        }
+
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            background-color: #ccc;
+        }
+
+        .description-content {
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 600px) {
+            .task-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <div class="container">
+        <section class="task-detail-card">
+            <h2>{{ task.title }}</h2>
+            <hr>
+
+            <div class="task-info">
+                <div class="task-info-item full-width">
+                    <strong>Descrição</strong>
+                    <p class="description-content">{{ task.description|default_if_none:"N/A" }}</p>
+                </div>
+
+                <div class="task-info-item">
+                    <strong>Status</strong>
+                    <span>{{ task.get_status_display }}</span>
+                </div>
+
+                <div class="task-info-item">
+                    <strong>Prioridade</strong>
+                    <span>{{ task.get_priority_display }}</span>
+                </div>
+
+                <div class="task-info-item full-width">
+                    <strong>Tags</strong>
+                    <div class="tags-list">
+                        {% for tag in task.tags.all %}
+                            <span class="tag-badge">{{ tag.name }}</span>
+                        {% empty %}
+                            <span class="tag-badge" style="background-color: #999; color: white;">Nenhuma</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="task-info-item">
+                    <strong>Data de Finalização</strong>
+                    <span>{{ task.due_date|date:"d/m/Y H:i"|default_if_none:"N/A" }}</span>
+                </div>
+
+                <div class="task-info-item">
+                    <strong>Criado em</strong>
+                    <span>{{ task.created_at|date:"d/m/Y H:i" }}</span>
+                </div>
+
+                <div class="task-info-item">
+                    <strong>Última atualização</strong>
+                    <span>{{ task.updated_at|date:"d/m/Y H:i"|default_if_none:"N/A" }}</span>
+                </div>
+            </div>
+
+            <hr style="margin: 20px 0;">
+
+            <div class="action-buttons">
+                <a href="{% url 'update_task' pk=task.pk %}" class="btn btn-default">Editar</a>
+                <a href="{% url 'delete_task' pk=task.pk %}" class="btn btn-danger">Deletar</a>
+                <a href="{% url 'tasks_list' %}" class="btn btn-secondary">Voltar para a lista</a>
+            </div>
+
+        </section>
+    </div>
+{% endblock %}
